@@ -30,8 +30,7 @@ jdobson_password=$(openssl rand -base64 32)
 echo "jdobson:$jdobson_password" | sudo chpasswd
 
 # disable password login for jdobson. only allow ssh key login
-sudo sed -
-i 's/^jdobson:.*$/jdobson:*:18493:0:99999:7:::/g' /etc/shadow
+sudo sed -i 's/^jdobson:.*$/jdobson:*:18493:0:99999:7:::/g' /etc/shadow
 
 # configure ssh server to disallow password login
 sudo sed -i 's/^PasswordAuthentication yes/PasswordAuthentication no/g' /etc/ssh/sshd_config
