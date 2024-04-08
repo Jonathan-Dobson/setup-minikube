@@ -22,26 +22,32 @@ sudo systemctl enable docker
 sudo service docker start
 
 # create my user
-sudo useradd -m -s /bin/bash jdobson
-sudo usermod -aG docker jdobson
 
-# create a strong random password for jdobson and save password
-jdobson_password=$(openssl rand -base64 32)
-echo "jdobson:$jdobson_password" | sudo chpasswd
+# prompt for username
+echo "Enter the username for the new user:"
+read username
 
-# disable password login for jdobson. only allow ssh key login
-sudo sed -i 's/^jdobson:.*$/jdobson:*:18493:0:99999:7:::/g' /etc/shadow
+# create user
+sudo useradd -m -s /bin/bash $username
+sudo usermod -aG docker $username
+
+# create a strong random password for $username and save password
+user_password=$(openssl rand -base64 32)
+echo "$username:$user_password" | sudo chpasswd
+
+# disable password login for $username. only allow ssh key login
+sudo sed -i 's/^$username:.*$/$username:*:18493:0:99999:7:::/g' /etc/shadow
 
 # configure ssh server to disallow password login
 sudo sed -i 's/^PasswordAuthentication yes/PasswordAuthentication no/g' /etc/ssh/sshd_config
 sudo systemctl restart sshd
 
-# install jdobson sshkey
-sudo mkdir /home/jdobson/.ssh
-sudo cp /root/.ssh/authorized_keys /home/jdobson/.ssh/authorized_keys
-sudo chown -R jdobson:jdobson /home/jdobson/.ssh
-sudo chmod 700 /home/jdobson/.ssh
-sudo chmod 600 /home/jdobson/.ssh/authorized_keys
+# install $username sshkey
+sudo mkdir -p /home/$username/.ssh
+sudo cp /root/.ssh/authorized_keys /home/$username/.ssh/authorized_keys
+sudo chown -R $username:$username /home/$username/.ssh
+sudo chmod 700 /home/$username/.ssh
+sudo chmod 600 /home/$username/.ssh/authorized_keys
 
 
 
