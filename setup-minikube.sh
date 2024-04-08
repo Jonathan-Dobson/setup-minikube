@@ -70,12 +70,21 @@ sudo service docker start
 sudo systemctl enable docker.service
 sudo systemctl enable containerd.service
 
-# install minikube https://minikube.sigs.k8s.io/docs/start/
-curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube_latest_amd64.deb
-sudo dpkg -i minikube_latest_amd64.deb
+# install kubectl
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.29/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+sudo apt-get update
+sudo apt-get install -y kubectl
+echo 'source <(kubectl completion bash)' >>~/.bashrc
+echo 'alias k=kubectl' >>~/.bashrc
+echo 'complete -o default -F __start_kubectl k' >>~/.bashrc
 
 
 
 
 
+
+echo "Installed Docker and kubernetes"
+echo "You may now logout of root and login as $username"
+echo "Then run 'kubernetes start' to start kubernetes"
 
