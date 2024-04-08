@@ -42,7 +42,7 @@ sudo chown -R $username:$username /home/$username/.ssh
 sudo chmod 700 /home/$username/.ssh
 sudo chmod 600 /home/$username/.ssh/authorized_keys
 
-# install docker
+# install docker  https://docs.docker.com/engine/install/debian/
 
 # Add Docker's official GPG key:
 sudo apt-get update
@@ -61,11 +61,16 @@ sudo apt-get update
 # install docker
 sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
 
+# add $username to docker group
+sudo usermod -aG docker $username
+
 # start docker and configure docker to start on boot
-sudo systemctl enable docker
 sudo service docker start
 
-# install minikube
+sudo systemctl enable docker.service
+sudo systemctl enable containerd.service
+
+# install minikube https://minikube.sigs.k8s.io/docs/start/
 curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube_latest_amd64.deb
 sudo dpkg -i minikube_latest_amd64.deb
 
