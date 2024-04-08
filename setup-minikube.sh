@@ -1,5 +1,23 @@
 #!/bin/bash
 
+# prompt for username
+echo "A user will be created and be given shell login permission."
+echo "This user will be added to the docker group."
+echo "Then root login will be disabled and password login will be disabled."
+echo "Only ssh key login will be allowed."
+echo "You will need your ssh public key to continue."
+echo "Please enter your ssh username:"
+read username
+
+# prompt for public ssh key
+echo "Please enter the public ssh key for $username:"
+echo "to generate a key pair, run 'ssh-keygen -t rsa -b 4096 -C \"
+$username@$(hostname)\"'"
+echo "then copy the contents of the public key file (usually you can run: cat ~/.ssh/id_rsa.pub)"
+echo "and paste it here."
+
+read ssh_key
+
 # Add Docker's official GPG key:
 sudo apt-get update
 sudo apt-get install ca-certificates curl
@@ -21,12 +39,6 @@ sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin 
 sudo systemctl enable docker
 sudo service docker start
 
-# create my user
-
-# prompt for username
-echo "Enter the username for the new user:"
-read username
-
 # create user
 sudo useradd -m -s /bin/bash $username
 sudo usermod -aG docker $username
@@ -40,14 +52,21 @@ sudo sed -i 's/^$username:.*$/$username:*:18493:0:99999:7:::/g' /etc/shadow
 
 # configure ssh server to disallow password login
 sudo sed -i 's/^PasswordAuthentication yes/PasswordAuthentication no/g' /etc/ssh/sshd_config
+# disable root login
+sudo sed -i 's/^PermitRootLogin yes/PermitRootLogin no/g' /etc/ssh/sshd_config
 sudo systemctl restart sshd
 
 # install $username sshkey
 sudo mkdir -p /home/$username/.ssh
-sudo cp /root/.ssh/authorized_keys /home/$username/.ssh/authorized_keys
+echo $ssh_key | sudo tee /home/$username/.ssh/authorized_keys
 sudo chown -R $username:$username /home/$username/.ssh
 sudo chmod 700 /home/$username/.ssh
 sudo chmod 600 /home/$username/.ssh/authorized_keys
+
+
+
+
+
 
 
 
